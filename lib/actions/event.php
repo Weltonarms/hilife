@@ -44,24 +44,27 @@ if (isset($_POST['setupTimeInput'])) {
   }
 }
 
-$query = "SELECT status FROM events_admin WHERE event_id=\"" . $_POST['id']  . "\"";
-$event_orig_status = $database->query($query)->fetchColumn();
-
 if ($user->isAdmin() || (isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response']))) {
  
   // Verify the reCAPTCHA API response 
   $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . constant("GOOGLE_RECAPTCHA") . '&response=' . $_POST['g-recaptcha-response']); 
    
   // Decode JSON data of API response 
-  $responseData = json_decode($verifyResponse); 
+  $responseData = json_decode($verifyResponse);
    
   // If the reCAPTCHA API response is valid 
   if($responseData->success || $user->isAdmin()) {
 
     if ($_POST['action'] == 'create') {
+
       $invalid = eventInvalid(array('primary_contact' => $_POST['event']['primary_contact'], 'email' => $_POST['event']['email'], 'date' => $event_timings['date'], 'status' => $_POST['admin']['status']));
+      $spam = eventIsSpam($event);
       if ($invalid) {
         Notify::add('error', 'Event cannot be created - ' . $invalid);
+
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+      } elseif ($spam) {
+        Notify::add('error', 'Event cannot be created - ' . $spam);
 
         header('Location: ' . $_SERVER['HTTP_REFERER']);
       } else {
@@ -148,6 +151,9 @@ if ($_POST['action'] == 'update') {
   $event_updated = EventFactory::create(array(
     'events.id' => $_POST['id']
   ), true);
+
+  $query = "SELECT status FROM events_admin WHERE event_id=\"" . $_POST['id']  . "\"";
+  $event_orig_status = $database->query($query)->fetchColumn();
 
   if ($event_updated->status != $event_orig_status) {
 
