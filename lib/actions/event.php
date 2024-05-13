@@ -58,7 +58,7 @@ if ($user->isAdmin() || (isset($_POST['g-recaptcha-response']) && !empty($_POST[
     if ($_POST['action'] == 'create') {
 
       $invalid = eventInvalid(array('primary_contact' => $_POST['event']['primary_contact'], 'email' => $_POST['event']['email'], 'date' => $event_timings['date'], 'status' => $_POST['admin']['status']));
-      $spam = eventIsSpam($event);
+      $spam = eventIsSpam($_POST['event']);
       if ($invalid) {
         Notify::add('error', 'Event cannot be created - ' . $invalid);
 
