@@ -37,12 +37,12 @@ function eventIsSpam($event) {
   $error = false;
 
   foreach($_POST['event'] as $key => $value) {
-    if (preg_match(constant("URL_PATTERN"), $value)) {
+    if (preg_match(constant("URL_PATTERN"), $value) > 0) {
       $error = 'Enquiries cannot contain any URL';
     }
 
     foreach (constant("BANNED_WORDS") as $banned_word) {
-      if (strpos($value, $banned_word) != false) {
+      if (strpos($value, $banned_word) >= 0) {
         $error = 'Enquiries cannot contain banned words';
       }
     }
