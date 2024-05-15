@@ -183,9 +183,6 @@ if ($_POST['action'] == 'cancel') {
 
   $event_updated->date = $utils->prettyDateFormat($event_updated->date);
 
-  Email::send('admin', $event_updated);
-  Email::send('customer', $event_updated);
-
   $config = $event_config[$user->isAdmin() ? 'admin' : 'customer'][$event_updated->status];
   if (isset($config['notification'])) {
     Notify::add($config['notification']['type'], $utils->templateString($config['notification']['text'], $event_updated));
