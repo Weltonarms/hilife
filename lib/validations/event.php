@@ -41,12 +41,12 @@ function eventIsSpam($event) {
       $error = 'Enquiries cannot contain any URL';
     }
 
-    // foreach (constant("BANNED_WORDS") as $key => $banned_word) {
-    //   if (strpos(strtolower($value), $banned_word) >= 0) {
-    //     // echo 'Enquiries cannot contain banned words' . $banned_word . ' ' . $value . "\n\n";
-    //     $error = 'Enquiries cannot contain banned words' . $banned_word . ' ' . $value;
-    //   }
-    // }
+    foreach (constant("BANNED_WORDS") as $key => $banned_word) {
+      if (stripos($value, $banned_word) !== false) {
+        // echo 'Enquiries cannot contain banned words' . $banned_word . ' ' . $value . "\n\n";
+        $error = 'Enquiries cannot contain banned words' . $banned_word . ' ' . $value;
+      }
+    }
   }
 
   return $error;
